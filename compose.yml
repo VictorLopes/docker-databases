@@ -1,0 +1,46 @@
+version: '3.7'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - ./docker/db/postgres-data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: test
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+    ports:
+      - '3306:3306'
+    volumes:
+      - './docker/db/mysql-data/data:/var/lib/mysql'
+      - './docker/db/mysql-data/my.cnf:/etc/mysql/conf.d/my.cnf'
+      - './docker/db/mysql-data/sql:/docker-entrypoint-initdb.d'
+
+  redis:
+    container_name: redis
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - './docker/db/redis-data:/bitnami/redis/data'
+  
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./docker/db/mongo-data:/data/db
